@@ -1,2 +1,2 @@
 # kondo
-Scripts for making tidy plots
+Scripts for making tidy plots that spark joy!
