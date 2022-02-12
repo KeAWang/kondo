@@ -27,9 +27,6 @@ def make_subplots(
     )
     fig.subplots_adjust(wspace=wspace, hspace=hspace)
 
-    if isinstance(axes, mpl.axes.Axes):
-        axes = np.array([[axes]])
-
     return fig, axes
 
 
