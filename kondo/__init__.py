@@ -4,6 +4,7 @@ import matplotlib.axes
 import numpy as np
 from matplotlib import font_manager
 from os.path import join, dirname, realpath
+from typing import Union, List
 
 
 def make_subplots(
@@ -65,10 +66,128 @@ STYLE_DIR = realpath(join(dirname(__file__), "styles"))
 COMMON = "common.mplstyle"
 
 
-def use_style(style=None):
+def use_style(style=None, palette=None):
     """Some of the tick properties cannot be set using ``plt.style.use``."""
     styles = [COMMON] if style is None else [COMMON, style + ".mplstyle"]
     plt.style.use(join(STYLE_DIR, s) for s in styles)
+
+    if palette is not None:
+        set_palette(palette)
+
+
+PALETTES = {
+    "tianyi": [
+        "#1d437d",
+        "#ee442f",
+        "#0099ad",
+        "#dec923",
+        "#a95aa1",
+        "#f78f1e",
+        "#ccbe9f",
+        "#29562a",
+        "#99cc83",
+    ],
+    "bmh": [
+        "#348ABD",
+        "#A60628",
+        "#7A68A6",
+        "#467821",
+        "#D55E00",
+        "#CC79A7",
+        "#56B4E9",
+        "#009E73",
+        "#F0E442",
+        "#0072B2",
+    ],
+    "solarized-light": [
+        "#268BD2",
+        "#2AA198",
+        "#859900",
+        "#B58900",
+        "#CB4B16",
+        "#DC322F",
+        "#D33682",
+        "#6C71C4",
+    ],
+    "fivethirtyeight": [
+        "#008fd5",
+        "#fc4f30",
+        "#e5ae38",
+        "#6d904f",
+        "#8b8b8b",
+        "#810f7c",
+    ],
+    "ggplot": [
+        "#E24A33",
+        "#348ABD",
+        "#988ED5",
+        "#777777",
+        "#FBC15E",
+        "#8EBA42",
+        "#FFB5B8",
+    ],
+    "degas-high-contrast": [
+        [0.372549, 0.596078, 1],
+        [1.0, 0.3882, 0.2784],
+        [0.20784314, 0.67843137, 0.6],
+        [0.59607843, 0.25882353, 0.89019608],
+        [0.803922, 0.0627451, 0.462745],
+        [0.917647, 0.682353, 0.105882],
+        [0.7, 0.7, 0.7],
+    ],
+    "degas-pastel-rainbow": np.array(
+        [
+            [221, 59, 53],
+            [211, 132, 71],
+            [237, 157, 63],
+            [165, 180, 133],
+            [63, 148, 109],
+            [50, 122, 137],
+            [44, 115, 178],
+            [43, 52, 124],
+        ]
+    )
+    / 255.0,
+}
+
+
+def get_palette(palette_name):
+    return PALETTES[palette_name]
+
+
+def set_palette(palette: Union[str, List[str]]):
+    if isinstance(palette, str):
+        palette = get_palette(palette)
+
+    from cycler import cycler
+    from matplotlib import pyplot as plt
+
+    plt.rcParams["axes.prop_cycle"] = cycler("color", palette)
+
+
+# From  https://github.com/williamgilpin/degas/blob/master/degas/degas.py
+def lighten(clr, f=1 / 3):
+    """
+    An implementation of Mathematica's Lighter[]
+    function for RGB colors
+    clr : 3-tuple or list, an RGB color
+    f : float, the fraction by which to brighten
+    """
+    gaps = [f * (1 - val) for val in clr]
+    new_clr = [val + gap for gap, val in zip(gaps, clr)]
+    return new_clr
+
+
+def darken(clr, f=1 / 3):
+    """
+    An implementation of Mathematica's Darker[]
+    function for RGB colors
+    clr : 3-tuple or list, an RGB color
+    f : float, the fraction by which to brighten
+    """
+    gaps = [f * val for val in clr]
+    new_clr = [val - gap for gap, val in zip(gaps, clr)]
+    return new_clr
 
 
 def reset_global_style():
@@ -82,7 +201,7 @@ def color_ticks(ax, color=None, axis="both", which="both"):
 
 
 # From  https://github.com/williamgilpin/degas/blob/master/degas/degas.py
-def lighter_color(color, f=1 / 3):
+def lighten_color(color, f=1 / 3):
     """
     An implementation of Mathematica's Lighter[]
     function for RGB colors
@@ -94,7 +213,7 @@ def lighter_color(color, f=1 / 3):
     return new_clr
 
 
-def darker_color(color, f=1 / 3):
+def darken_color(color, f=1 / 3):
     """
     An implementation of Mathematica's Darker[]
     function for RGB colors
@@ -106,9 +225,9 @@ def darker_color(color, f=1 / 3):
     return new_clr
 
 
-def lighter_palette(palette, f=1 / 3):
-    return [lighter_color(p, f=f) for p in palette]
+def lighten_palette(palette, f=1 / 3):
+    return [lighten_color(p, f=f) for p in palette]
 
 
-def darker_palette(palette, f=1 / 3):
-    return [darker_color(p, f=f) for p in palette]
+def darken_palette(palette, f=1 / 3):
+    return [darken_color(p, f=f) for p in palette]
