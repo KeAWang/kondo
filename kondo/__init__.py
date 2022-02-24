@@ -2,7 +2,9 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.axes
 import numpy as np
+from contextlib import contextmanager
 from matplotlib import font_manager
+from matplotlib.artist import ArtistInspector
 from os.path import join, dirname, realpath
 from typing import Union, List
 
@@ -70,6 +72,77 @@ def use_style(style=None, palette=None):
 
     if palette is not None:
         set_palette(palette)
+
+
+@contextmanager
+def plt_breakpoint():
+    """
+    Type `u` three times to go to code wrapped in this context manager.
+    Then manipulate the plot via pdb as you please
+    To finish, type `c` to continue execution, or `q` to quit the process.
+
+    Example usage:
+    ```
+    x, y = expensive_function()
+    with plt_breakpoint():
+        fig, ax = plt.subplots()
+        ax.plot(x, y)
+    ```
+
+    This code is equivalent to manually entering
+    ```
+    x, y = expensive_function()
+    with plt.ion():
+        fig, ax = plt.subplots()
+        ax.plot(x, y)
+        breakpoint()
+    ```
+    but packaged as one single context manager.
+
+    After interactive mode, you can get the properties of your figure and axes via
+    ```
+    fig_prop = plt.getp(fig)
+    ax_prop = plt.getp(ax)
+    ```
+    and save them if you wish.
+
+    """
+    with plt.ion():
+        try:
+            yield
+        finally:
+            breakpoint()
+
+
+def getp(obj, property=None, all=False):
+    """
+    Like plt.getp, but actually returns the dictionary of properties that are settable
+
+    TODO: plt.setp doesn't work properly. Example:
+    ```
+    x = np.linspace(0, 2*np.pi)
+    y = np.sin(x)
+
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
+    old = getp(ax)
+
+    plt.setp(ax, **old)
+    # This will result in a figure that looks different from before, even though we're using the same properties
+    # Somehow, the ybounds change
+    ```
+    To get around this, we need to explicitly set xbound, ybound, xlim, ylim after
+    plt.setp if we're setting properties of Axes
+    """
+    if property is not None:
+        return plt.getp(property)
+    insp = ArtistInspector(obj)
+    setable_props = set(insp.get_setters())
+    props = insp.properties()
+    if all:
+        return props
+    props = {k: v for k, v in props.items() if k in setable_props}
+    return props
 
 
 PALETTES = {
