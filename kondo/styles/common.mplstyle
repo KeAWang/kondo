@@ -78,7 +78,7 @@
 #### LINES
 ## See http://matplotlib.org/api/artist_api.html#module-matplotlib.lines for more
 ## information on line properties.
-lines.linewidth   : 3     ## line width in points
+lines.linewidth   : 1.5     ## line width in points
 #lines.linestyle   : -       ## solid line
 #lines.color       : C0      ## has no affect on plot(); see axes.prop_cycle
 #lines.marker      : None    ## the default marker
@@ -291,7 +291,7 @@ mathtext.fontset : cm ## Should be 'dejavusans' (default),
 ## default face and edge color, default tick sizes,
 ## default fontsizes for ticklabels, and so on.  See
 ## http://matplotlib.org/api/axes_api.html#module-matplotlib.axes
-axes.facecolor      : 1.0   ## axes background color
+axes.facecolor      : white   ## axes background color
 axes.edgecolor      : 0.8 ## axes edge color
 axes.linewidth      : 1.25     ## edge linewidth
 # Remember to turn on minor grid with ax.minorticks_on
