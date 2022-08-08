@@ -7,4 +7,5 @@ setup(
     description="Package for making tidy plots that spark joy",
     author="Ke Alexander Wang",
     license="MIT",
+    include_package_data=True,
 )
